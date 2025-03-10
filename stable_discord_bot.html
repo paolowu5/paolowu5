@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diffusion Bot • AI Image Generation for Discord</title>
+    <style>
+        :root {
+            --bg-main: #0f0f0f;
+            --bg-card: #1a1a1a;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --accent: #8a2be2;
+            --accent-gradient: linear-gradient(135deg, #8a2be2, #4169e1);
+            --glow: 0 0 15px rgba(138, 43, 226, 0.4);
+            --radius-sm: 8px;
+            --radius-md: 16px;
+            --radius-lg: 24px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+        }
+        
+        html {
+            /* Removing default smooth scroll to use custom JS implementation */
+            scroll-behavior: auto;
+        }
+        
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            line-height: 1.6;
+            background-image: url('https://source.unsplash.com/random/1920x1080/?abstract,digital,pattern');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            position: relative;
+        }
+        
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(15, 15, 15, 0.85);
+            z-index: -1;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+        
+        header {
+            position: sticky;
+            top: 0;
+            background: rgba(15, 15, 15, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 100;
+        }
+        
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 0;
+        }
+        
+        .logo {
+            font-weight: 800;
+            font-size: 1.5rem;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+        
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-links a:hover {
+            color: var(--text-primary);
+        }
+        
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            background: var(--accent-gradient);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius-sm);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            gap: 0.5rem;
+            box-shadow: var(--glow);
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 25px rgba(138, 43, 226, 0.6);
+        }
+        
+        .hero {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 8rem 0 6rem;
+            text-align: center;
+        }
+        
+        /* Moving gradient text */
+        .gradient-text {
+            font-size: 4rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            background-size: 200% 200%;
+            animation: gradientShift 3s ease infinite;
+        }
+        
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+        
+        /* Mouse-follow gradient effect */
+        .interactive-gradient {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+        
+        .interactive-gradient span {
+            position: relative;
+            z-index: 1;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .hero p {
+            font-size: 1.25rem;
+            max-width: 700px;
+            color: var(--text-secondary);
+            margin-bottom: 3rem;
+        }
+        
+        .glass-card {
+            background: rgba(26, 26, 26, 0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .demo-container {
+            position: relative;
+            margin: 2rem auto 0;
+            max-width: 900px;
+            height: 500px;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+        
+        .glowing-bg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: var(--accent-gradient);
+            filter: blur(100px);
+            opacity: 0.2;
+            z-index: -1;
+        }
+        
+        .demo-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: var(--radius-lg);
+        }
+        
+        section {
+            padding: 6rem 0;
+        }
+        
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            transition: background-position 0.3s ease;
+        }
+        
+        .section-subtitle {
+            text-align: center;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto 4rem;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .feature-card {
+            background: rgba(26, 26, 26, 0.5);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            padding: 2rem;
+            border-radius: var(--radius-md);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--accent-gradient);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--glow);
+        }
+        
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin: 1rem 0;
+            font-weight: 700;
+        }
+        
+        .feature-icon {
+            font-size: 2rem;
+            color: var(--accent);
+        }
+        
+        .feature-card p {
+            color: var(--text-secondary);
+        }
+        
+        .screenshots {
+            background: rgba(26, 26, 26, 0.5);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            padding: 3rem 0;
+            margin-top: 3rem;
+            border-radius: var(--radius-lg);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .screenshot-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            padding: 0 2rem;
+        }
+        
+        .screenshot {
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .screenshot img {
+            width: 100%;
+            display: block;
+            height: auto;
+        }
+        
+        .screenshot-caption {
+            margin-top: 1rem;
+            color: var(--text-secondary);
+            text-align: center;
+            font-size: 0.875rem;
+        }
+        
+        .commands-container {
+            overflow: auto;
+            border-radius: var(--radius-md);
+            background: rgba(26, 26, 26, 0.5);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            margin-top: 3rem;
+        }
+        
+        .command-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .command-table th, .command-table td {
+            padding: 1.25rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .command-table th {
+            background: rgba(138, 43, 226, 0.1);
+            color: var(--accent);
+            font-weight: 600;
+        }
+        
+        .command-table tr:hover td {
+            background: rgba(255, 255, 255, 0.03);
+        }
+        
+        code {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--accent);
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--radius-sm);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.875rem;
+        }
+        
+        .setup-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        
+        .step {
+            display: flex;
+            gap: 1.5rem;
+            align-items: flex-start;
+        }
+        
+        .step-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            background: var(--accent-gradient);
+            color: white;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        
+        .step-content {
+            flex-grow: 1;
+            background: rgba(26, 26, 26, 0.5);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            padding: 1.5rem 2rem;
+            border-radius: var(--radius-md);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .step h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+        
+        .step p {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+        
+        pre {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem;
+            border-radius: var(--radius-sm);
+            overflow-x: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.875rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        ul {
+            padding-left: 1.5rem;
+            color: var(--text-secondary);
+        }
+        
+        ul li {
+            margin-bottom: 0.5rem;
+        }
+        
+        footer {
+            padding: 4rem 0;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        
+        .footer-links {
+            display: flex;
+            gap: 2rem;
+        }
+        
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            color: var(--accent);
+        }
+        
+        .copyright {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-top: 1rem;
+        }
+        
+        /* Modern Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--bg-main);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: rgba(138, 43, 226, 0.3);
+            border-radius: 5px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(138, 43, 226, 0.5);
+        }
+        
+        @media (max-width: 768px) {
+            .gradient-text {
+                font-size: 2.5rem;
+            }
+            
+            .hero p {
+                font-size: 1rem;
+            }
+            
+            .screenshot-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .demo-container {
+                height: 300px;
+            }
+            
+            .step {
+                flex-direction: column;
+            }
+            
+            .step-number {
+                margin-bottom: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <div class="logo">Diffusion Bot</div>
+                <div class="nav-links">
+                    <a href="#features">Features</a>
+                    <a href="#demo">Demo</a>
+                    <a href="#commands">Commands</a>
+                    <a href="#setup">Setup</a>
+                </div>
+                <a href="https://github.com/yourusername/stable-diffusion-discord-bot" class="cta-button">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"></path><path d="M9 18c-4.51 2-5-2-7-2"></path></svg>
+                    Get on GitHub
+                </a>
+            </nav>
+        </div>
+    </header>
+    
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1 class="gradient-text">AI Image Generation for Discord</h1>
+                <p>Transform text prompts into stunning visuals directly in your Discord server using the power of Stable Diffusion</p>
+                <a href="#setup" class="cta-button">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+                    Get Started
+                </a>
+                
+                <div class="demo-container glass-card">
+                    <div class="glowing-bg"></div>
+                    <img src="/api/placeholder/900/500" alt="Diffusion Bot in action" class="demo-img">
+                </div>
+            </div>
+        </section>
+        
+        <section id="features">
+            <div class="container">
+                <h2 class="section-title">Features</h2>
+                <p class="section-subtitle">A complete suite of AI image generation tools integrated directly into your Discord server</p>
+                
+                <div class="features-grid">
+                    <div class="feature-card glass-card">
+                        <div class="feature-icon">✨</div>
+                        <h3>Text-to-Image</h3>
+                        <p>Generate high-quality images from text prompts with customizable parameters including aspect ratio, detail steps, and CFG scale.</p>
+                    </div>
+                    <div class="feature-card glass-card">
+                        <div class="feature-icon">🔄</div>
+                        <h3>Image-to-Image</h3>
+                        <p>Transform existing images by simply uploading them with a description of your desired changes. No command needed!</p>
+                    </div>
+                    <div class="feature-card glass-card">
+                        <div class="feature-icon">⚙️</div>
+                        <h3>Model Selection</h3>
+                        <p>Choose from different Stable Diffusion models to get the perfect style for your specific generation needs.</p>
+                    </div>
+                    <div class="feature-card glass-card">
+                        <div class="feature-icon">🔍</div>
+                        <h3>One-Click Upscaling</h3>
+                        <p>Enhance the resolution of generated images with ESRGAN technology for higher quality results.</p>
+                    </div>
+                    <div class="feature-card glass-card">
+                        <div class="feature-icon">🎭</div>
+                        <h3>Image Variations</h3>
+                        <p>Create multiple variations of generated images with simple controls to explore different creative directions.</p>
+                    </div>
+                    <div class="feature-card glass-card">
+                        <div class="feature-icon">📝</div>
+                        <h3>Prompt Library</h3>
+                        <p>Access a collection of example prompts to help inspire your creations and improve your results.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="demo">
+            <div class="container">
+                <h2 class="section-title">See It In Action</h2>
+                <p class="section-subtitle">Transform your ideas into visual art with simple commands</p>
+                
+                <div class="screenshots glass-card">
+                    <div class="screenshot-grid">
+                        <div>
+                            <div class="screenshot">
+                                <img src="/api/placeholder/600/350" alt="Generated images grid">
+                            </div>
+                            <p class="screenshot-caption">Four images generated from a single text prompt using the /imagine command</p>
+                        </div>
+                        <div>
+                            <div class="screenshot">
+                                <img src="/api/placeholder/600/350" alt="Image transformation">
+                            </div>
+                            <p class="screenshot-caption">Image transformation: Original image and AI-transformed result</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="commands">
+            <div class="container">
+                <h2 class="section-title">Commands</h2>
+                <p class="section-subtitle">Simple set of commands to unleash your creativity</p>
+                
+                <div class="commands-container glass-card">
+                    <table class="command-table">
+                        <thead>
+                            <tr>
+                                <th>Command</th>
+                                <th>Description</th>
+                                <th>Example</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>/imagine</code></td>
+                                <td>Generate 4 images from a text prompt with optional parameters</td>
+                                <td><code>/imagine prompt: mountain landscape aspect: 16:9 steps: 30 cfg: 7</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>/models</code></td>
+                                <td>View and select different Stable Diffusion models</td>
+                                <td><code>/models</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>/negative</code></td>
+                                <td>View or update the negative prompt used in generation</td>
+                                <td><code>/negative</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>/resolution</code></td>
+                                <td>Set the resolution for generated images</td>
+                                <td><code>/resolution</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>/prompt</code></td>
+                                <td>Get example prompts to inspire your creations</td>
+                                <td><code>/prompt</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>/help</code></td>
+                                <td>Display available commands and features</td>
+                                <td><code>/help</code></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+        
+        <section id="setup">
+            <div class="container">
+                <h2 class="section-title">Quick Setup</h2>
+                <p class="section-subtitle">Get up and running in minutes</p>
+                
+                <div class="setup-steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content glass-card">
+                            <h3>Prerequisites</h3>
+                            <p>Make sure you have the following:</p>
+                            <ul>
+                                <li>Python 3.8 or higher</li>
+                                <li>Discord Bot Token</li>
+                                <li>Stable Diffusion WebUI with API enabled</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content glass-card">
+                            <h3>Clone Repository</h3>
+                            <p>Get the bot code from GitHub:</p>
+                            <pre>git clone https://github.com/yourusername/stable-diffusion-discord-bot.git
+cd stable-diffusion-discord-bot</pre>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content glass-card">
+                            <h3>Install Dependencies</h3>
+                            <p>Install the required Python packages:</p>
+                            <pre>pip install -r requirements.txt</pre>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-content glass-card">
+                            <h3>Configure Bot</h3>
+                            <p>Edit CONFIG/config.py with your Discord token and API URL:</p>
+                            <pre>TOKEN = "YOUR_DISCORD_BOT_TOKEN"
+url = "http://127.0.0.1:7860"</pre>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">5</div>
+                        <div class="step-content glass-card">
+                            <h3>Start Stable Diffusion</h3>
+                            <p>Launch Stable Diffusion WebUI with API enabled:</p>
+                            <pre>python launch.py --api</pre>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">6</div>
+                        <div class="step-content glass-card">
+                            <h3>Launch the Bot</h3>
+                            <p>Start the Discord bot:</p>
+                            <pre>python main.py</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="logo">Diffusion Bot</div>
+                <div class="footer-links">
+                    <a href="https://github.com/yourusername/stable-diffusion-discord-bot">GitHub</a>
+                    <a href="https://github.com/yourusername/stable-diffusion-discord-bot/issues">Report Issues</a>
+                    <a href="https://github.com/AUTOMATIC1111/stable-diffusion-webui">Stable Diffusion WebUI</a>
+                </div>
+                <p class="copyright">© 2025 Diffusion Bot • Powered by Stable Diffusion</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mouse-follow gradient effect for text elements with class "section-title"
+        document.addEventListener('mousemove', function(e) {
+            const titles = document.querySelectorAll('.section-title');
+            
+            titles.forEach(title => {
+                // Calculate position relative to the title
+                const rect = title.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                
+                // Calculate distance from mouse to center of title
+                const distanceX = e.clientX - centerX;
+                const distanceY = e.clientY - centerY;
+                
+                // Calculate gradient angle based on mouse position
+                const angle = Math.atan2(distanceY, distanceX) * (180 / Math.PI);
+                
+                // Update gradient
+                title.style.backgroundImage = `linear-gradient(${angle}deg, #8a2be2, #4169e1)`;
+            });
+        });
+
+        // Smooth scroll for navigation and Get Started button
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    // Get the target's position relative to the document
+                    const headerOffset = 80;
+                    const elementPosition = targetElement.getBoundingClientRect().top;
+                    const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                    
+                    // Animation variables
+                    const startPosition = window.pageYOffset;
+                    const distance = offsetPosition - startPosition;
+                    
+                    // Animation variables
+                    let startTime = null;
+                    const duration = 800; // Duration in milliseconds
+                    
+                    // Easing function - easeInOutCubic
+                    function easeInOutCubic(t) {
+                        return t < 0.5 
+                            ? 4 * t * t * t 
+                            : 1 - Math.pow(-2 * t + 2, 3) / 2;
+                    }
+                    
+                    // Animation function
+                    function animation(currentTime) {
+                        if (startTime === null) startTime = currentTime;
+                        const timeElapsed = currentTime - startTime;
+                        const progress = Math.min(timeElapsed / duration, 1);
+                        const easedProgress = easeInOutCubic(progress);
+                        
+                        const currentScrollPosition = startPosition + (distance * easedProgress);
+                        window.scrollTo({
+                            top: currentScrollPosition,
+                            behavior: 'auto'
+                        });
+                        
+                        if (timeElapsed < duration) {
+                            requestAnimationFrame(animation);
+                        }
+                    }
+                    
+                    // Start animation
+                    requestAnimationFrame(animation);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
