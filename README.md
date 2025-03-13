@@ -1,19 +1,42 @@
-<h1 align="center">Hi 👋, I'm Paolo</h1>
-<h3 align="center">A designer from Italy</h3>
+# Paolo Allegretti
 
-- 🔭 I’m currently working on **FakeJourney**
+## Motion & Graphic Designer
 
-- 🌱 I’m currently learning **React Three Fiber**
+Experienced designer specializing in real-time graphics, motion design, and multimedia production. I arrived late to GitHub because I was busy creating visual experiences for broadcast and events - check out my [showreel](https://www.youtube.com/watch?v=cpRl55O0F9Q) to see what kept me occupied!
 
-- 💬 Ask me about **graphics**
+### Current Projects
 
-- 📫 How to reach me **paolodibarile@gmail.com**
+- Working on **Discord Diffusion Bot** - AI-assisted design tools
+- Learning **React Three Fiber** for 3D web experiences
+- Building tools to enhance creative workflows
 
-- ⚡ Fun fact **I'm always running**
+### Skills
 
-<h3 align="left">Connect with me:</h3>
-<p align="left">
-</p>
+- Real-time graphics for broadcast & events
+- Motion design & animation
+- 3D modeling & visualization
+- AI-assisted design & generation
+- Print & digital design
 
-<h3 align="left">Languages and Tools:</h3>
-<p align="left"> <a href="https://www.blender.org/" target="_blank" rel="noreferrer"> <img src="https://download.blender.org/branding/community/blender_community_badge_white.svg" alt="blender" width="40" height="40"/> </a> <a href="https://www.figma.com/" target="_blank" rel="noreferrer"> <img src="https://www.vectorlogo.zone/logos/figma/figma-icon.svg" alt="figma" width="40" height="40"/> </a> <a href="https://www.adobe.com/in/products/illustrator.html" target="_blank" rel="noreferrer"> <img src="https://www.vectorlogo.zone/logos/adobe_illustrator/adobe_illustrator-icon.svg" alt="illustrator" width="40" height="40"/> </a> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank" rel="noreferrer"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/javascript/javascript-original.svg" alt="javascript" width="40" height="40"/> </a> <a href="https://www.photoshop.com/en" target="_blank" rel="noreferrer"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/photoshop/photoshop-line.svg" alt="photoshop" width="40" height="40"/> </a> <a href="https://www.python.org" target="_blank" rel="noreferrer"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/python/python-original.svg" alt="python" width="40" height="40"/> </a> <a href="https://reactjs.org/" target="_blank" rel="noreferrer"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/react/react-original-wordmark.svg" alt="react" width="40" height="40"/> </a> <a href="https://www.typescriptlang.org/" target="_blank" rel="noreferrer"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/typescript/typescript-original.svg" alt="typescript" width="40" height="40"/> </a> <a href="https://unrealengine.com/" target="_blank" rel="noreferrer"> <img src="https://raw.githubusercontent.com/kenangundogan/fontisto/036b7eca71aab1bef8e6a0518f7329f13ed62f6b/icons/svg/brand/unreal-engine.svg" alt="unreal" width="40" height="40"/> </a> </p>
+### Tools & Technologies
+
+- After Effects & Adobe Creative Suite
+- Blender & Unreal Engine
+- Figma & UI/UX design
+- JavaScript/TypeScript & React
+- Python for automation
+
+### GitHub Projects
+
+- [Lazy Slideshow](https://github.com/paolowu5/after-effects-lazy-slideshow) - Script for quick slideshow creation in After Effects
+- [Discord Diffusion Bot](https://github.com/paolowu5/stable-diffusion-discord-bot) - Discord bot replicating Midjourney functionality
+
+### Fun Facts
+
+- Always running (both literally and with tight deadlines)
+- Working on daily television graphics for major Italian broadcasts
+- Self-taught in most creative disciplines
+
+Contact
+
+📫 Email: paolodibarile@gmail.com
