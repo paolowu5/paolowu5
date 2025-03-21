@@ -1,10 +1,10 @@
-# [www.paoloallegretti.com](www.paoloallegretti.com)
 
 ### Motion & Graphic Designer
 
 Self-taught graphic designer with over 15 years of experience in real-time 2D/3D graphics, motion design, and event visuals. Proficient in After Effects, Unreal Engine, Blender, and AI tools like Stable Diffusion.
 
 Got to github late, beeing busy doing [this kind of stuff](https://www.youtube.com/watch?v=cpRl55O0F9Q)
+
 
 ### Current Projects
 
